@@ -13,7 +13,7 @@ class FileHelpers {
         File f = start.toFile();
         List<File> result = new ArrayList<>();
         if(f.isDirectory()) {
-            System.out.println("It's a folder");
+            // System.out.println("It's a folder");
             File[] paths = f.listFiles();
             for(File subFile: paths) {
                 result.addAll(getFiles(subFile.toPath()));
@@ -25,7 +25,7 @@ class FileHelpers {
         return result;
     }
     static String readFile(File f) throws IOException {
-        System.out.println(f.toString());
+        // System.out.println(f.toString());
         return new String(Files.readAllBytes(f.toPath()));
     }
 }
@@ -36,7 +36,30 @@ class Handler implements URLHandler {
       this.files = FileHelpers.getFiles(Paths.get(directory));
     }
     public String handleRequest(URI url) throws IOException {
-      return "Don't know how to handle that path!";
+      if (url.getPath().equals("/")) {
+            // int size = FileHelpers.getFiles(new Path("."));
+            // return "There are " + numFiles + " files to search.";
+        } else {
+            // /search?q=search-term
+            if (url.getPath().contains("/search")) {
+                String[] parameters = url.getQuery().split("=");
+                if (parameters[0].equals("q")) {
+                    String term = parameters[1];
+                    List files = FileHelpers.getFiles(Paths.get("."));
+                    String res = "";
+                    int total = 0;
+                    for (Object o : files) {
+                        File f = (File) o;
+                        String contents = FileHelpers.readFile(f);
+                        total += 1;
+                        res += f.getPath() + '\n';
+                    }
+                    return res;
+                }
+            }
+           
+        }
+        return "404 Not Found!";
     }
 }
 
